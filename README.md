@@ -13,6 +13,8 @@ RumbleHeartRateDisplay is a lightweight, user-friendly mod designed for real-tim
 
 ## Configuration
 
+Standand setup for Rumble mods, copy the Mods, UserLibs and UserData folders into your Rumble folder (Melon Loader should already be setup for this to work, see https://discord.gg/fsbcnZgzfa for help)
+
 There is a settings file included with the files, which needs to be updated with the name of your bluetooth device. 
 
 To determine the name of your Bluetooth heart rate monitor:
