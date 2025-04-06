@@ -17,7 +17,7 @@ namespace RumbleHeartRateDisplay
         {
             try
             {
-                Core.Logger.Msg("Starting Mod Application for heart rate data...");
+                Core.Logger.Msg("Starting application for heart rate data...");
                 StartBluetoothHandler();
 
                 using (var pipeClient = new NamedPipeClientStream(".", "HeartRatePipe", PipeDirection.In))
@@ -34,18 +34,15 @@ namespace RumbleHeartRateDisplay
                             if (line != null && line.StartsWith("HeartRate:"))
                             {
                                 var heartRate = line.Replace("HeartRate:", "").Trim();
-                                Core.Logger.Msg($"Received Heart Rate: {heartRate} BPM");
                                 HeartHud.UpdateHeartUi(Int32.Parse(heartRate));
                             }
                         }
                     }
                 }
-
-                Core.Logger.Msg("BLE scan completed.");
             }
             catch (Exception e)
             {
-                Core.Logger.Msg("exception occured connecting to bluetooth: " + e.Message);
+                Core.Logger.Msg("Exception occured connecting to bluetooth: " + e.Message);
             }
 
         }
@@ -59,13 +56,13 @@ namespace RumbleHeartRateDisplay
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "UserData/BluetoothConnectionManager.exe", // Path to the Bluetooth handler executable
-                        Arguments = "", // Optional arguments
-                        CreateNoWindow = true, // Hide the console window if not needed
+                        Arguments = Settings.Instance.BluetoothDeviceName, // Pass device name to the bluetooth handler
+                        CreateNoWindow = true, // Hide the console window
                         UseShellExecute = false
                     }
                 };
                 bluetoothProcess.Start();
-                Core.Logger.Msg("Bluetooth handler started.");
+                Core.Logger.Msg($"Bluetooth handler started, looking for a device named {Settings.Instance.BluetoothDeviceName}");
             }
             catch (Exception ex)
             {
@@ -77,6 +74,7 @@ namespace RumbleHeartRateDisplay
         {
             try
             {
+                HeartHud.UpdateHeartUi(0);
                 if (bluetoothProcess != null && !bluetoothProcess.HasExited)
                 {
                     bluetoothProcess.Kill();
@@ -87,6 +85,12 @@ namespace RumbleHeartRateDisplay
             {
                 Core.Logger.Msg($"Failed to stop Bluetooth handler: {ex.Message}");
             }
+        }
+
+        public async static void RestartBluetoothHandler(HeartRateReceiver receiverInstance)
+        {
+            StopBluetoothHandler();
+            await receiverInstance.StartStreamingHeartRate();
         }
     }
 }

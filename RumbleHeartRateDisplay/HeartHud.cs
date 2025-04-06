@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Il2CppTMPro;
 using MelonLoader;
+using System.Collections;
 
 namespace RumbleHeartRateDisplay
 {
@@ -112,7 +113,19 @@ namespace RumbleHeartRateDisplay
         {
             if (uiElements == null) return;
 
-            uiElements.HeartRate.text = $"{heartRate}   BPM";
+            MelonCoroutines.Start(UpdateHeartUiCoroutine(heartRate));
+        }
+
+        private static IEnumerator UpdateHeartUiCoroutine(int heartRate)
+        {
+            yield return null; // Wait for the next frame (ensures main thread execution)
+            PerformHeartUiUpdate(heartRate);
+        }
+
+
+        public static void PerformHeartUiUpdate(int heartRate)
+        {
+            uiElements.HeartRate.text = heartRate >= 10 ? $"{heartRate}   BPM" : "-- BPM";
 
             Color heartTextColor = ModResources.HeartDefaultColor;
 
@@ -124,9 +137,13 @@ namespace RumbleHeartRateDisplay
             {
                 heartTextColor = ModResources.HeartMediumColor;
             }
-            else
+            else if (heartRate >= 10)
             {
                 heartTextColor = ModResources.HeartLowColor;
+            }
+            else
+            {
+                heartTextColor = ModResources.HeartDefaultColor;
             }
 
             if (heartRate > 0)

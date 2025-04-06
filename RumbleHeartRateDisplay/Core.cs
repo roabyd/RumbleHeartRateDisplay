@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.HID;
 
 namespace RumbleHeartRateDisplay
 {
@@ -17,6 +15,8 @@ namespace RumbleHeartRateDisplay
         //private BLEManagerOld _bleManager;
         private HeartRateReceiver _heartRateReceiver;
 
+        private string settingsFilePath = @"UserData\RumbleHeartHud.xml";
+
         public static MelonLogger.Instance Logger { get; private set; }
 
         public override void OnInitializeMelon()
@@ -24,18 +24,20 @@ namespace RumbleHeartRateDisplay
             Logger = LoggerInstance;
             LoggerInstance.Msg("RumbleHeartRateDisplay: Initialized.");
 
-            //_bleManager = new BLEManagerOld();
-            //_bleManager.OnDeviceDiscovered += DeviceDiscoveredHandler;
+            try
+            {
+                Settings.FromXmlFile(settingsFilePath);
+                LoggerInstance.Msg("Loaded settings from file.");
+            }
+            catch
+            {
+                Settings.Initialize();
+                LoggerInstance.Msg("Unable to load settings. Using defaults.");
+            }
+
             _heartRateReceiver = new HeartRateReceiver();
 
-            // Start scanning for devices asynchronously
-            //_ = Task.Run(() => _bleManager.StartScanningAsync("Pixel Watch"));
             _ = Task.Run(() => _heartRateReceiver.StartStreamingHeartRate());
-        }
-
-        private void DeviceDiscoveredHandler(string deviceName)
-        {
-            LoggerInstance.Msg($"Device discovered: {deviceName}");
         }
 
         public override void OnUpdate()
@@ -51,13 +53,16 @@ namespace RumbleHeartRateDisplay
                 HeartHud.Initialize();
             }
 
-
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                _ = Task.Run(() => HeartRateReceiver.RestartBluetoothHandler(_heartRateReceiver));
+            }
         }
 
         public override void OnApplicationQuit()
         {
             MelonLogger.Msg("Game is exiting...");
-            // Perform cleanup or save data here
+            // Stop the bluetooth handler process
             HeartRateReceiver.StopBluetoothHandler();
         }
     }
