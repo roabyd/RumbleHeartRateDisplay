@@ -20,11 +20,11 @@ There is a settings file included with the files, which needs to be updated with
 To determine the name of your Bluetooth heart rate monitor:
 
 1. Turn on your Bluetooth heart rate monitor and ensure it's in pairing mode.
-2. I used the android app "nRF Connect" to look for your device in the list of available devices.
-3. Note the name of your heart rate monitor as it appears in the list and connect to it
-4. For your device to be compatible, it should expose the "Heart Rate" primary service UUID: 0x180D
-5. If this is exposed, update the RumbleHeartHud.xml file with the name of the device.
-6. Before opening Rumble, you can run the BluetoothConnectionManager.exe and if everything is working, it will start logging heart rate data. If this happens you can close the file and open Rumble and everything should work
+2. I used the android app "nRF Connect" to look for the device in the list of available devices.
+3. Note the name of your heart rate monitor as it appears in the list and connect to it (For your device to be compatible, it should expose the "Heart Rate" primary service UUID: 0x180D)
+4. If this is exposed, before opening Rumble, you can run the BluetoothConnectionManager.exe. This will prompt you to input the name of the device and if everything is working, it will start logging heart rate data. Press any key to close this program.
+5. Once you have confirmed the above is working, update the RumbleHeartHud.xml file with the name of the device, and you can now open Rumble as you would normally.
+
 
 If the exe does not start logging heart rate data, it should output some error message to help find the issue.
 

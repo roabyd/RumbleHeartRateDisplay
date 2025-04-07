@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO.Pipes;
+﻿using System.IO.Pipes;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using InTheHand.Bluetooth;
 
 namespace BluetoothConnectionManager
@@ -11,18 +8,26 @@ namespace BluetoothConnectionManager
     {
         // The name of the device to connect to. This will be populated by an inocming argument
         private static string bluetoothDeviceName = ""; 
+        private static bool runningStandalone = false;
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting Bluetooth Handler Application...");
             if (args.Length > 0)
             {
                 bluetoothDeviceName = args[0]; // The first argument
+                runningStandalone = false;
             }
             else
             {
-                Console.WriteLine("No device name was supplied. Please update the settings file with a device name.");
-                Thread.Sleep(10000); // Pause for 10,000 milliseconds (10 seconds)
-                return;
+                while (string.IsNullOrEmpty(bluetoothDeviceName))
+                {
+                    // Prompt the user for input
+                    Console.WriteLine("Please enter your name of your bluetooth heart rate tracking device:");
+
+                    // Read the input from the user
+                    bluetoothDeviceName = Console.ReadLine();
+                    runningStandalone = true;
+                }
             }            
 
             // Scan for devices
@@ -88,16 +93,18 @@ namespace BluetoothConnectionManager
                 // Open named pipe for communication
                 using (var pipeServer = new NamedPipeServerStream("HeartRatePipe", PipeDirection.Out))
                 {
-                    Console.WriteLine("Waiting for client connection...");
-                    pipeServer.WaitForConnection();
-                    Console.WriteLine("Client connected!");
-
+                    if (!runningStandalone)
+                    {
+                        Console.WriteLine("Waiting for client connection...");
+                        pipeServer.WaitForConnection();
+                        Console.WriteLine("Client connected!");
+                    }
                     // Handle value changes for notifications
                     heartRateCharacteristic.CharacteristicValueChanged += async (sender, args) =>
                     {
                         var heartRate = args.Value[1]; // Extract heart rate from notification data
                         Console.WriteLine($"Heart Rate: {heartRate} BPM");
-                        if (heartRate != lastSentHeartRate)
+                        if (heartRate != lastSentHeartRate && !runningStandalone)
                         {
                             // Send heart rate data through the pipe
                             var message = $"HeartRate:{heartRate}\n";
