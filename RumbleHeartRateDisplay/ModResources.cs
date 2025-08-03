@@ -1,12 +1,12 @@
 ﻿using Il2CppTMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
 namespace RumbleHeartRateDisplay
 {
     internal class ModResources
     {
-        private static Il2CppAssetBundle bundle;
+        private static AssetBundle bundle;
 
         private static TMP_FontAsset tmpFont;
         private static GameObject heartImageObject;
@@ -26,7 +26,7 @@ namespace RumbleHeartRateDisplay
         { 
             if (initialized && !reload) return;
 
-            bundle = Il2CppAssetBundleManager.LoadFromFile(@"UserData/heartratebundle");
+            bundle = LoadAssetBundleFromFile(@"UserData/heartratebundle");
             tmpFont = GameObject.Instantiate(bundle.LoadAsset<TMP_FontAsset>("TMP_GoodDogPlain"));
             heartImageObject = GameObject.Instantiate(bundle.LoadAsset<GameObject>("HeartImageObject"));
             heartImageObject.name = "RumbleHeartHud_heartImageObject";
@@ -34,6 +34,40 @@ namespace RumbleHeartRateDisplay
             GameObject.DontDestroyOnLoad(heartImageObject);
 
             initialized = true;
+        }
+
+        public static AssetBundle LoadAssetBundleFromFile(string filePath)
+        {
+            Stream stream = StreamFromFile(filePath);
+            Il2CppSystem.IO.Stream il2CppStream = ConvertToIl2CppStream(stream);
+            AssetBundle bundle = AssetBundle.LoadFromStream(il2CppStream);
+            stream.Close();
+            il2CppStream.Close();
+            return bundle;
+        }
+
+        public static MemoryStream StreamFromFile(string path)
+        {
+            byte[] fileBytes = File.ReadAllBytes(path);
+            return new MemoryStream(fileBytes);
+        }
+
+        public static Il2CppSystem.IO.Stream ConvertToIl2CppStream(Stream stream)
+        {
+            Il2CppSystem.IO.MemoryStream Il2CppStream = new Il2CppSystem.IO.MemoryStream();
+
+            const int bufferSize = 4096;
+            byte[] managedBuffer = new byte[bufferSize];
+            Il2CppStructArray<byte> il2CppBuffer = new(managedBuffer);
+
+            int bytesRead;
+            while ((bytesRead = stream.Read(managedBuffer, 0, managedBuffer.Length)) > 0)
+            {
+                il2CppBuffer = managedBuffer;
+                Il2CppStream.Write(il2CppBuffer, 0, bytesRead);
+            }
+            Il2CppStream.Flush();
+            return Il2CppStream;
         }
     }
 

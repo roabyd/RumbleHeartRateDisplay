@@ -1,0 +1,9 @@
+{
+  "name": "RumbleHeartRateDisplay",
+  "version_number": "1.1.0",
+  "website_url": "https://github.com/roabyd/RumbleHeartRateDisplay/tree/master",
+  "description": "A simple modification to display your current heart rate in your stream for others to view",
+  "dependencies": [
+	"LavaGang-MelonLoader-0.7.0"
+  ]
+}

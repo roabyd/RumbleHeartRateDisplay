@@ -2,7 +2,7 @@
 using System.Reflection;
 using RumbleHeartRateDisplay;
 
-[assembly: MelonInfo(typeof(Core), BuildInfo.ModName, BuildInfo.ModVersion, BuildInfo.Author)]
+[assembly: MelonInfo(typeof(Core), RumbleHeartRateDisplay.BuildInfo.ModName, RumbleHeartRateDisplay.BuildInfo.ModVersion, RumbleHeartRateDisplay.BuildInfo.Author)]
 [assembly: MelonGame("Buckethead Entertainment", "RUMBLE")]
 [assembly: MelonColor(50, 168, 164, 255)]
 [assembly: MelonAuthorColor(50, 168, 164, 255)]

@@ -49,6 +49,7 @@ namespace RumbleHeartRateDisplay
             GameObject.DontDestroyOnLoad(uiContainer);
             GameObject.DontDestroyOnLoad(canvas);
 
+            uiContainer.active = false;
             initialized = true;
         }
 
@@ -129,7 +130,7 @@ namespace RumbleHeartRateDisplay
 
             Color heartTextColor = ModResources.HeartDefaultColor;
 
-            if (heartRate > 140)
+            if (heartRate > 130)
             {
                 heartTextColor = ModResources.HeartHighColor;
             }
@@ -149,11 +150,12 @@ namespace RumbleHeartRateDisplay
             if (heartRate > 0)
             {
                 uiElements.Container.GetComponent<Animator>().SetFloat(heartSpeedParamName, heartRate * 0.0166f);
+                uiContainer.active = true;
             }
             else
             {
-
-               uiElements.Container.GetComponent<Animator>().SetFloat(heartSpeedParamName, 0);
+                uiContainer.active = false;
+                uiElements.Container.GetComponent<Animator>().SetFloat(heartSpeedParamName, 0);
             }
 
             uiElements.HeartRate.color = heartTextColor;
